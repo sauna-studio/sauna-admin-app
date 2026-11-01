@@ -88,3 +88,9 @@ PRには関連Issue、何が変わるか、実行したチェックと結果、�
 このGitHub上のレビューは、実装中の独立Review Agent並行起動と実ビルド・テストに追加する確認である。レビュー依頼だけで成功扱いにしない。自動返信・同じ依頼の連投を避け、レビューroundと対象commitをPRへ記録する。
 
 共通追加規則の適用元: `sauna-studio/.github@e24383d0f9fe6784293e1b781edffd08750f0a20` (`policies/github-codex-review.md`)。
+
+## Apple依存catalog / compiler policy
+
+指定10repositoryの宣言は`docs/dependency-catalog.json`、解決revisionは`Package.resolved`を正本とし、`python3 scripts/validate_swift_policy.py`でeffective manifestと照合する。自前targetは6 upcoming features・defaultIsolation(nil)・strictMemorySafety・warnings-as-errors・Swift6を適用し、外部dependencyへ強制しない。公開Foundation境界はpublic import、生成code手編集/unsafe抑制/unchecked escapeをしない。
+
+catalog登録とproduct/runtime使用を区別する。Defaultsへ認証情報を保存せず、Valetへ暗黙移行せず、retryを非冪等認証へ自動適用しない。opaque認証型へmemberwise macroを適用しない。macro/HTTPproposalの環境overrideやplugin sandbox/validation無効化を追加しない。詳細・実在する検証コマンドは`docs/dependency-catalog.md`を参照する。
