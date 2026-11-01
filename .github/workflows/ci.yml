@@ -14,3 +14,27 @@ jobs:
     uses: sauna-studio/.github/.github/workflows/reusable-repository.yml@84222ff551e9b6e9bab6ba4f29fe3ddb990b37cb
     permissions:
       contents: read
+  apple-foundation:
+    runs-on: xcode-27
+    timeout-minutes: 25
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_27.2.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Record selected toolchain
+        run: |
+          xcodebuild -version
+          swift --version
+      - name: Resolve the committed dependency pins
+        run: swift package resolve --force-resolved-versions
+      - name: Verify compiler policy and dependency catalog
+        run: python3 scripts/validate_swift_policy.py
+      - name: Build minimal foundation on the host
+        run: swift build --force-resolved-versions
+      - name: Build minimal foundation against the iOS Simulator SDK
+        run: >-
+          swift build --force-resolved-versions --scratch-path .build/ios-simulator
+          --triple arm64-apple-ios27.2-simulator
+          --sdk "$(xcrun --sdk iphonesimulator --show-sdk-path)"
